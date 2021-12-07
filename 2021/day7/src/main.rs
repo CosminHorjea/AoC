@@ -5,24 +5,26 @@ fn get_fuel(units:u32) -> u32 {
 }
 
 fn main() {
-    let numbers: Vec<i32> = include_str!("../day7.in").split(",").map(|x| x.parse::<i32>().unwrap()).collect::<Vec<i32>>();
+  let numbers: Vec<i32> = include_str!("../day7.in").split(",").map(|x| x.parse::<i32>().unwrap()).collect::<Vec<i32>>();
 
-  let max_val = numbers.iter().max().unwrap();
+  //sort numbers
+  let mut numbers = numbers.clone();
+  numbers.sort();
 
-  let mut minimum = 1186527293; // get a random big num  
-  for i in 0..*max_val{
-
-    let mut total_fuel = 0;
-    for num in numbers.iter() {    
-      total_fuel += get_fuel((num-i).abs() as u32);
-    }
-    // print!("i={} : {}\n",i, total_fuel);
-    minimum = std::cmp::min(total_fuel, minimum);
-    // if minimum > total_fuel{
-    //   minimum = total_fuel;
-    //   print!("Found it at {} : {}\n",i,minimum)
-    // }
+  let median =  numbers[numbers.len()/2];
+  let mut total_fuel = 0;
+  for num in &numbers{
+    total_fuel += (num-median).abs();
   }
-  println!("Part 2: {}", minimum);
+  println!("Part 1: {}", total_fuel);
+  
+  let avg = numbers.iter().sum::<i32>()/numbers.len() as i32;
+  let mut total_fuel = 0;  
+  for num in &numbers{
+    total_fuel += get_fuel((num-avg).abs() as u32);
+  }
     
+  println!("Part 2: {}", total_fuel);
+  
+  // Brute force works as well, input is really small  
 }
