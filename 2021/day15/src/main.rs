@@ -1,4 +1,7 @@
+use std::cmp::Reverse;
+use std::collections::BinaryHeap;
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 fn main() {
     let content = include_str!("../day15.in");
@@ -25,37 +28,40 @@ fn main() {
             }
         }
     }
-    // println!("{:?}", risks[49]);
-    // for j in 0..50 {
-    //     print!("{}", risks.get(&(49, j)).unwrap());
-    // }
-    // println!();
 
-    for i in 0..rows * 5 {
-        for j in 0..cols * 5 {
-            // println!("{} {}", i, j);
-            if i == 0 && j == 0 {
+    // println!("{}", risks.len());
+    let mut queue = BinaryHeap::new();
+    queue.push((Reverse(0), (0, 0)));
+    let mut visited: HashSet<(usize, usize)> = HashSet::new();
+    while let Some((Reverse(risk), (i, j))) = queue.pop() {
+        // println!("{} {}", i, j);
+        if i == rows * 5 - 1 && j == cols * 5 - 1 {
+            println!("Part 2: {}", risk);
+            break;
+        }
+        let moves = [(0, -1), (1, 0), (0, 1), (-1, 0)];
+        if visited.contains(&(i, j)) {
+            continue;
+        }
+        visited.insert((i, j));
+        for (x, y) in moves {
+            let new_i = i as isize + x;
+            let new_j = j as isize + y;
+            if new_i < 0
+                || new_j < 0
+                || new_i >= (rows * 5) as isize
+                || new_j >= (cols * 5) as isize
+            {
                 continue;
             }
-            if i == 0 {
-                // why tf does this work???!!??!?!? BECAUSE IT'S SAFE , and slow af
-                let prev = risks[i][j - 1];
-                risks[i][j] += prev
-            } else if j == 0 {
-                let prev = risks[i - 1][j];
-                risks[i][j] += prev
-            } else {
-                let previ = risks[i - 1][j];
-                let prevj = risks[i][j - 1];
-                let prev = previ.min(prevj);
-                risks[i][j] += prev
-            }
+            let new_risk = risk + risks[new_i as usize][new_j as usize];
+            queue.push((Reverse(new_risk), (new_i as usize, new_j as usize)));
         }
     }
-    println!(
-        "Part 2 {} by RustLang ",
-        risks[risks.len() - 1][risks[0].len() - 1] - risks[0][0]
-    );
+    // println!(
+    //     "Part 2 {} by RustLang ",
+    //     risks[risks.len() - 1][risks[0].len() - 1] - risks[0][0]
+    // );
 }
 
 // too high 2935
