@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 fn main() {
-    let content = include_str!("../day15.in");
+    let content = include_str!("../day15.test");
     let scan = content
         .lines()
         .map(|line| {
@@ -25,11 +25,19 @@ fn main() {
             }
         }
     }
-    // println!("{:?}", risks[49]);
-    // for j in 0..50 {
-    //     print!("{}", risks.get(&(49, j)).unwrap());
-    // }
-    // println!();
+    for i in 0..rows* 5{
+        if i % 3 == 0 {
+            println!("-------------------------------")
+        }
+        for j in 0..cols*5 {
+            if j % 5 == 0 {
+                print!("|")
+            }
+            print!("{}", risks[i][j]);
+        }
+        println!("");
+        
+    }
 
     for i in 0..rows * 5 {
         for j in 0..cols * 5 {
@@ -38,7 +46,6 @@ fn main() {
                 continue;
             }
             if i == 0 {
-                // why tf does this work???!!??!?!? BECAUSE IT'S SAFE , and slow af
                 let prev = risks[i][j - 1];
                 risks[i][j] += prev
             } else if j == 0 {
@@ -47,8 +54,7 @@ fn main() {
             } else {
                 let previ = risks[i - 1][j];
                 let prevj = risks[i][j - 1];
-                let prev = previ.min(prevj);
-                risks[i][j] += prev
+                risks[i][j] += previ.min(prevj);
             }
         }
     }
