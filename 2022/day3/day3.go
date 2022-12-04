@@ -21,26 +21,26 @@ func main() {
 		panic(err)
 	}
 	// Part1
-	// total := 0
-	// for _, line := range strings.Split(string(data), "\n") {
-	// 	firstHalf := line[:len(line)/2]
-	// 	secondHalf := line[len(line)/2:]
-	// 	// fmt.Printf("%s %s\n", firstHalf, secondHalf)
-	// 	seenItems := map[string]bool{}
-	// 	for i := 0; i < len(firstHalf); i++ {
-	// 		seenItems[string(firstHalf[i])] = true
-	// 	}
-	// 	for i := 0; i < len(secondHalf); i++ {
-	// 		if seenItems[string(secondHalf[i])] {
-	// 			// fmt.Printf("Found %s in both halves\n", string(secondHalf[i]))
-	// 			total = total + strings.Index(proprities, string(secondHalf[i])) + 1
-	// 			break
-	// 		}
-	// 	}
-	// }
-	// fmt.Printf("Part 1: %d\n", total)
-
 	total := 0
+	for _, line := range strings.Split(string(data), "\n") {
+		firstHalf := line[:len(line)/2]
+		secondHalf := line[len(line)/2:]
+		// fmt.Printf("%s %s\n", firstHalf, secondHalf)
+		seenItems := map[string]bool{}
+		for i := 0; i < len(firstHalf); i++ {
+			seenItems[string(firstHalf[i])] = true
+		}
+		for i := 0; i < len(secondHalf); i++ {
+			if seenItems[string(secondHalf[i])] {
+				// fmt.Printf("Found %s in both halves\n", string(secondHalf[i]))
+				total = total + strings.Index(proprities, string(secondHalf[i])) + 1
+				break
+			}
+		}
+	}
+	fmt.Printf("Part 1: %d\n", total)
+
+	total = 0
 	lines := strings.Split(string(data), "\n")
 	// group lines in chunks of 3
 	lines_chunks := [][]string{}
@@ -66,6 +66,6 @@ func main() {
 			}
 		}
 	}
-	fmt.Println("Part 2", total)
+	fmt.Println("Part 2:", total)
 
 }
