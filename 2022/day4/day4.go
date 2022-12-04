@@ -25,23 +25,23 @@ func main() {
 		panic(err)
 	}
 	// Part 1
-	// total := 0
-	// lines := strings.Split(string(data), "\n")
-	// for _, line := range lines {
-	// 	sections := strings.Split(line, ",")
-	// 	first_section := strings.Split(sections[0], "-")
-	// 	first_pair := toPair(first_section)
-	// 	second_section := strings.Split(sections[1], "-")
-	// 	second_pair := toPair(second_section)
-	// 	if first_pair.Contains(second_pair) || second_pair.Contains(first_pair) {
-	// 		total++
-	// 	}
-	// }
-	// fmt.Println(total)
-
-	// part2
 	total := 0
 	lines := strings.Split(string(data), "\n")
+	for _, line := range lines {
+		sections := strings.Split(line, ",")
+		first_section := strings.Split(sections[0], "-")
+		first_pair := toPair(first_section)
+		second_section := strings.Split(sections[1], "-")
+		second_pair := toPair(second_section)
+		if first_pair.Contains(second_pair) || second_pair.Contains(first_pair) {
+			total++
+		}
+	}
+	fmt.Println("Part 1", total)
+
+	// part2
+	total = 0
+	lines = strings.Split(string(data), "\n")
 	for _, line := range lines {
 		sections := strings.Split(line, ",")
 		first_section := strings.Split(sections[0], "-")
@@ -54,7 +54,7 @@ func main() {
 			total++
 		}
 	}
-	fmt.Println(total)
+	fmt.Println("Part 2:", total)
 }
 
 func toPair(section []string) Pair {
@@ -68,7 +68,6 @@ func (p Pair) Contains(other_pair Pair) bool {
 }
 
 func (p Pair) Overlaps(other_pair Pair) bool {
-	fmt.Println("check: ", p, other_pair)
 	if p.left > other_pair.right {
 		return false
 	}
