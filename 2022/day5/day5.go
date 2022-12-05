@@ -7,26 +7,57 @@ import (
 	"strings"
 )
 
-var (
-	stacks_test = [4]string{
-		"",
-		"ZN",
-		"MCD",
-		"P",
+// hardcode the stacks at the beginning
+// var (
+// 	stacks_test = [4]string{
+// 		"",
+// 		"ZN",
+// 		"MCD",
+// 		"P",
+// 	}
+// 	stacks = [10]string{
+// 		"",
+// 		"WDGBHRV",
+// 		"JNGCRF",
+// 		"LSFHDNJ",
+// 		"JDSV",
+// 		"SHDRQWNV",
+// 		"PGHCH",
+// 		"FJBGLZHC",
+// 		"SJR",
+// 		"LGSRBNVM",
+// 	}
+// )
+
+func parseStacks(rawData string) []string {
+	fmt.Println(rawData)
+	lines := strings.Split(rawData, "\n")
+	max_length := 0
+	for _, line := range lines {
+		if len(line) > max_length {
+			max_length = len(line)
+		}
 	}
-	stacks = [10]string{
-		"",
-		"WDGBHRV",
-		"JNGCRF",
-		"LSFHDNJ",
-		"JDSV",
-		"SHDRQWNV",
-		"PGHCH",
-		"FJBGLZHC",
-		"SJR",
-		"LGSRBNVM",
+	transposed := make([]string, max_length)
+	for _, line := range lines {
+		for j, char := range line {
+			transposed[j] += string(char)
+		}
 	}
-)
+	stacks := []string{}
+	stacks = append(stacks, "")
+	for _, line := range transposed {
+		line = strings.ReplaceAll(line, " ", "")
+		line = strings.ReplaceAll(line, "[", "")
+		line = strings.ReplaceAll(line, "]", "")
+		if len(line) == 0 {
+			continue
+		}
+		stacks = append(stacks, reverseString(line[:len(line)-1]))
+	}
+
+	return stacks
+}
 
 func main() {
 	// data, err := os.ReadFile("input_test.txt")
@@ -34,7 +65,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	for _, row := range strings.Split(string(data), "\n") {
+	lines := strings.Split(string(data), "\n\n")[1]
+	stacks := parseStacks(strings.Split(string(data), "\n\n")[0])
+	for _, row := range strings.Split(lines, "\n") {
 		// fmt.Println(row)
 		commands := strings.Split(row, " ")
 		qty, _ := strconv.Atoi(commands[1])
