@@ -2,3 +2,5 @@ target/
 *.lock
 *.exe
 *.pdb
+
+2022/*/input.txt
