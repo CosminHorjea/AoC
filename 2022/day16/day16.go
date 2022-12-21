@@ -43,46 +43,53 @@ func main() {
 		valves[label] = Valve{flow, neighbours}
 	}
 	distances := floydWarshall(valves)
-	// fmt.Println(distances)
-	usefulValesLabel := []string{"BB", "CC", "DD", "EE", "HH"}
-	// for label, v := range valves {
-	// 	if v.flow > 0 {
-	// 		usefulValesLabel = append(usefulValesLabel, label)
-	// 	}
-	// }
-	fmt.Println(usefulValesLabel)
+	usefulValesLabel := make([]string, 0)
+	for label, v := range valves {
+		if v.flow > 0 {
+			usefulValesLabel = append(usefulValesLabel, label)
+		}
+	}
 	init := make(map[string]int)
 	for _, v := range usefulValesLabel {
 		init[v] = 0
 	}
 
-	ans := max_pressure(0, "AA", init, distances, valves)
-	fmt.Println(distances["AA"])
+	ans, opened := max_pressure(0, "AA", init, distances, valves)
+
 	fmt.Println(ans)
+	fmt.Println(opened)
 
 }
 
-func max_pressure(time int, pos string, opened map[string]int, distances map[string]map[string]int, valves map[string]Valve) int {
-	fmt.Println(opened)
+// make this return a list of valves opened and the flow, even if it isn;t max, call this 2 times and find out when
+func max_pressure(time int, pos string, opened map[string]int, distances map[string]map[string]int, valves map[string]Valve) (int, []map[string]int) {
 	max_p := 0
+	paths := make([]map[string]int, 0)
 	for label, isOpen := range opened {
 		if isOpen == 1 {
 			continue
 		}
 		next_time := time + distances[pos][label] + 1
 		if next_time >= 30 {
+			paths = append(paths, opened)
 			continue
 		} else {
 			next_pressure := (30 - next_time) * valves[label].flow
-			opened[label] = 1
+			opened_c := make(map[string]int)
+			for k, v := range opened {
+				opened_c[k] = v
+			}
+			opened_c[label] = 1
 
-			aux := next_pressure + max_pressure(next_time, label, opened, distances, valves)
+			new_val, _ := max_pressure(next_time, label, opened_c, distances, valves)
+			aux := next_pressure + new_val
 			if max_p < aux {
 				max_p = aux
+				paths = append(paths, opened_c)
 			}
 		}
 	}
-	return max_p
+	return max_p, paths
 }
 
 func floydWarshall(graph map[string]Valve) map[string]map[string]int {
