@@ -3,4 +3,9 @@ target/
 *.exe
 *.pdb
 
-2022/*/input.txt
+*/input.txt
+*/*.in
+2023/obj
+2023/bin
+.vs
+*.in
