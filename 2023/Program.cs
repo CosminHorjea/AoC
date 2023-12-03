@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 
 var day = DateTime.Now.Day;
-day = 1;
 
 var currentDaySolution = Assembly.GetExecutingAssembly().CreateInstance($"Day{day}");
 
