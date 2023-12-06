@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Text.Json;
 
 class Day5 : Solution
 {
@@ -87,18 +88,20 @@ class Day5 : Solution
         return rules;
     }
 
+    class Interval
+    {
+        public BigInteger start { get; set; }
+        public BigInteger end { get; set; }
+    }
+
     public string Part2()
     {
-        var lines = File.ReadAllLines("Inputs/Day5.test");
+        var lines = File.ReadAllLines("Inputs/Day5.in");
         var seeds_ranges = lines[0].Split(": ")[1].Split(" ").Select(BigInteger.Parse).ToList();
-        var seeds = new List<BigInteger>();
-        for (var i = seeds_ranges[0]; i < seeds_ranges[0] + seeds_ranges[1]; i++)
+        var seeds_intervals = new List<Interval>();
+        for (int i = 0; i < seeds_ranges.Count; i += 2)
         {
-            seeds.Add(i);
-        }
-        for (var i = seeds_ranges[2]; i < seeds_ranges[2] + seeds_ranges[3]; i++)
-        {
-            seeds.Add(i);
+            seeds_intervals.Add(new Interval { start = seeds_ranges[i], end = seeds_ranges[i] + seeds_ranges[i + 1] - 1 });
         }
         var rulesLists = new List<List<Rule>>();
         List<string> acc = new List<string>();
@@ -115,14 +118,101 @@ class Day5 : Solution
             }
         }
         rulesLists.Add(parseRules(acc));
-        Console.WriteLine("number of rule maps" + rulesLists.Count);
 
         var locations = new List<BigInteger>();
-        foreach (var seed in seeds)
+        foreach (var seed_interval in seeds_intervals)
         {
-            locations.Add(getLocation(seed, rulesLists));
+            locations.Add(getLocation(seed_interval, rulesLists));
         }
         Console.WriteLine(locations.Min());
+        Console.WriteLine(JsonSerializer.Serialize(locations.Select(l => l.ToString()).ToList()));
+        locations.Sort();
+        Console.WriteLine(JsonSerializer.Serialize(locations.Select(l => l.ToString()).ToList()));
         return "";
+        // 50142747 high
+    }
+
+    private BigInteger getLocation(Interval seed_interval, List<List<Rule>> rulesLists)
+    {
+        var intervals = new List<Interval>
+        {
+            seed_interval
+        };
+        foreach (var list in rulesLists)
+        {
+            intervals = getNext(intervals, list);
+        }
+        return intervals.OrderBy(i => i.start).First().start;
+    }
+
+    private List<Interval> getNext(List<Interval> seed_intervals, List<Rule> list)
+    {
+        var intervals = new List<Interval>();
+        var seeds_queue = new Queue<Interval>(seed_intervals);
+        while (seeds_queue.Count > 0)
+        {
+            var seed_interval = seeds_queue.Dequeue();
+            var found = false;
+            for (int i = 0; i < list.Count; i++)
+            {
+                var currentIntervl = new Interval { start = list[i].source, end = list[i].source + list[i].length - 1 };
+                if (seed_interval.start >= currentIntervl.start && seed_interval.end <= currentIntervl.end)
+                {
+                    intervals.Add(new Interval
+                    {
+                        start = list[i].destination + seed_interval.start - list[i].source,
+                        end = list[i].destination + seed_interval.end - list[i].source
+                    });
+                    found = true;
+                    break;
+                }
+                if (seed_interval.start < currentIntervl.start && seed_interval.end > currentIntervl.end)
+                {
+                    var first_interval = new Interval { start = seed_interval.start, end = currentIntervl.start - 1 };
+                    var middle_interval = new Interval
+                    {
+                        start = list[i].destination + seed_interval.start - list[i].source,
+                        end = list[i].destination + currentIntervl.end - list[i].source
+                    };
+                    var last_interval = new Interval { start = currentIntervl.end + 1, end = seed_interval.end };
+                    intervals.Add(middle_interval);
+                    seeds_queue.Enqueue(first_interval);
+                    seeds_queue.Enqueue(last_interval);
+                    found = true;
+                    break;
+                }
+                if (seed_interval.start < currentIntervl.start && seed_interval.end > currentIntervl.start)
+                {
+                    var first_interval = new Interval { start = seed_interval.start, end = currentIntervl.start - 1 };
+                    var middle_interval = new Interval
+                    {
+                        start = list[i].destination + currentIntervl.start - list[i].source,
+                        end = list[i].destination + seed_interval.end - list[i].source
+                    };
+                    intervals.Add(middle_interval);
+                    seeds_queue.Enqueue(first_interval);
+                    found = true;
+                    break;
+                }
+                if (seed_interval.start < currentIntervl.end && seed_interval.end > currentIntervl.end)
+                {
+                    var middle_interval = new Interval
+                    {
+                        start = list[i].destination + seed_interval.start - list[i].source,
+                        end = list[i].destination + currentIntervl.end - list[i].source
+                    };
+                    var last_interval = new Interval { start = currentIntervl.end + 1, end = seed_interval.end };
+                    intervals.Add(middle_interval);
+                    seeds_queue.Enqueue(last_interval);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                intervals.Add(seed_interval);
+            }
+        }
+        return intervals;
     }
 }
