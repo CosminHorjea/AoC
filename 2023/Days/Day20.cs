@@ -55,7 +55,7 @@ class Day20 : Solution
     }
     public string Part1()
     {
-        var content = File.ReadAllLines("Inputs/Day20.test");
+        var content = File.ReadAllLines("Inputs/Day20.in");
         Dictionary<string, Module> modules = new Dictionary<string, Module>();
         Dictionary<string, List<string>> inputs = new Dictionary<string, List<string>>();
         foreach (var line in content)
@@ -92,6 +92,10 @@ class Day20 : Solution
         }
         foreach (var i in inputs)
         {
+            if (!modules.TryGetValue(i.Key, out var module))
+            {
+                continue;
+            }
             if (modules[i.Key].moduleType != ModuleType.CONJUNCTION)
             {
                 continue;
@@ -106,25 +110,25 @@ class Day20 : Solution
         for (int i = 0; i < 1000; i++)
         {
             var (low, high) = GetCount(modules);
+            // Console.WriteLine($"{i}:{low} {high}");
+
             lo += low;
             hi += high;
         }
+        // Console.WriteLine($"{lo} {hi}");
         return $"{lo * hi}";
     }
 
     private static (int, int) GetCount(Dictionary<string, Module> modules)
     {
-        Queue<(PULSE, string)> q = new Queue<(PULSE, string)>();
-        q.Enqueue((PULSE.LOW, "broadcaster"));
+        Queue<(PULSE, string, string)> q = new Queue<(PULSE, string, string)>();// pulse, rev mod, send mod
+        q.Enqueue((PULSE.LOW, "broadcaster", "button"));
         int lo = 0;
         int hi = 0;
         while (q.Count > 0)
         {
             var curr = q.Dequeue();
-            if (!modules.TryGetValue(curr.Item2, out var module))
-            {
-                continue;
-            }
+            Console.WriteLine($"{curr.Item1} {curr.Item2}");
             switch (curr.Item1)
             {
                 case PULSE.LOW:
@@ -134,10 +138,14 @@ class Day20 : Solution
                     hi++;
                     break;
             }
+            if (!modules.TryGetValue(curr.Item2, out var module))
+            {
+                continue;
+            }
             var next_pulse = curr.Item1;
             if (module.moduleType == ModuleType.START)
             {
-                next_pulse = PULSE.LOW;
+                next_pulse = curr.Item1;
             }
             else if (module.moduleType == ModuleType.FLIP_FLOP)
             {
@@ -150,7 +158,7 @@ class Day20 : Solution
             }
             else if (module.moduleType == ModuleType.CONJUNCTION)
             {
-                module.setPulse(module.Label, curr.Item1);
+                module.setPulse(curr.Item3, curr.Item1);
                 if (module.LastPulses.All(a => a.Value == PULSE.HIGH))
                 {
                     next_pulse = PULSE.LOW;
@@ -167,7 +175,7 @@ class Day20 : Solution
 
             foreach (var n in module.neighbors)
             {
-                q.Enqueue((next_pulse, n));
+                q.Enqueue((next_pulse, n, curr.Item2));
             }
         }
         return (lo, hi);
