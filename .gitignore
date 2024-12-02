@@ -5,7 +5,7 @@ target/
 
 */input.txt
 */*.in
-2023/obj
-2023/bin
+*/obj
+*/bin
 .vs
 *.in
