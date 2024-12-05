@@ -1,4 +1,3 @@
-
 class Day4 : Solution
 {
     public string Part1()
