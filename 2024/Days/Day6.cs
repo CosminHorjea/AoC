@@ -78,6 +78,7 @@ class Day6 : Solution
             {
                 var newObstacles = new HashSet<(int, int)>(obstacles);
                 newObstacles.Add((i, j));
+                // it takes a while, but it's AoC 😅
                 if (explorer != (i, j) && map[i][j] != '#' && IsLooping(n, m, newObstacles, explorer))
                 {
                     answer++;
