@@ -9,3 +9,4 @@ target/
 */bin
 .vs
 *.in
+2025/**/*.txt
